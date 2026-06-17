@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Doctor Details</title>
+    <style>
+        body { font-family: Roboto, sans-serif; text-align: center; margin: 20px; background: #f4f4f4; }
+
+        .doctor-details {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .doctor-details img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            object-fit: cover;
+        }
+
+        .doctor-details h2 { width: 100%; text-align: center; }
+        .doctor-details p  { text-align: left; margin: 6px 0; }
+
+        .book-appointment-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 16px auto 0;
+        }
+
+        .book-appointment-btn:hover { background-color: #45a049; }
+
+        .back-link { margin-top: 16px; }
+        .back-link a { color: #4caf50; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="doctor-details" id="doctorDetailsContainer"></div>
+        <div class="back-link"><a href="patient2.html">← Back to Doctors List</a></div>
+    </div>
+
+    <script>
+        const doctorData = {
+            doctor1: {
+                name: "Dr. Akash Roy", specialty: "Cardiologist",
+                education: "MD in Cardiology, ABC Medical School",
+                experience: "10+ years of experience",
+                img: "https://randomuser.me/api/portraits/men/32.jpg",
+                description: "A distinguished Cardiologist with over a decade of experience. Dedicated to enhancing heart health and trusted for diagnosing and treating cardiac conditions."
+            },
+            doctor2: {
+                name: "Dr. Jane Barnes", specialty: "Pediatrician",
+                education: "MD in Pediatrics, XYZ Medical College",
+                experience: "8+ years of experience",
+                img: "https://randomuser.me/api/portraits/women/44.jpg",
+                description: "Devoted over 8 years to delivering comprehensive healthcare to children and adolescents with a caring and holistic approach."
+            },
+            doctor3: {
+                name: "Dr. Michael Scott", specialty: "Orthopedic Surgeon",
+                education: "MS in Orthopedics, DEF University",
+                experience: "12+ years of experience",
+                img: "https://randomuser.me/api/portraits/men/56.jpg",
+                description: "Renowned Orthopedic Surgeon with 12+ years. Expert in diagnosing and treating musculoskeletal conditions and restoring mobility."
+            },
+            doctor4: {
+                name: "Dr. Shruti Sharma", specialty: "OB-GYN",
+                education: "MD in Obstetrics and Gynecology, GHI Medical Institute",
+                experience: "9+ years of experience",
+                img: "https://randomuser.me/api/portraits/women/68.jpg",
+                description: "Passionate about women's health with 9+ years of experience providing personalized care to patients."
+            },
+            doctor5: {
+                name: "Dr. Robert Green", specialty: "Neurologist",
+                education: "PhD in Neurology, JKL University",
+                experience: "15+ years of experience",
+                img: "https://randomuser.me/api/portraits/men/78.jpg",
+                description: "Distinguished Neurologist with 15+ years specializing in diagnosis and treatment of neurological disorders."
+            }
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('doctor');
+        const container = document.getElementById('doctorDetailsContainer');
+
+        if (doctorData[id]) {
+            const d = doctorData[id];
+            container.innerHTML = `
+                <img src="${d.img}" alt="${d.name}">
+                <h2>${d.name}</h2>
+                <p><strong>Specialty:</strong> ${d.specialty}</p>
+                <p><strong>Education:</strong> ${d.education}</p>
+                <p><strong>Experience:</strong> ${d.experience}</p>
+                <p>${d.description}</p>
+                <button class="book-appointment-btn" onclick="window.location.href='appointmentbook.html'">Book Appointment</button>
+            `;
+        } else {
+            container.innerHTML = '<p>Doctor not found.</p>';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Doctor Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .task-container {
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .buttons-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            right: 20px;
+        }
+
+        .button {
+            padding: 15px;
+            width: 70px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .button-done {
+            background-color: #4CAF50;
+            color: white;
+            font-size: 15px;
+            margin-right: 30px;
+        }
+
+        h1 {
+            background-color: #252525;
+            padding: 10px;
+            margin: 0;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        h2 { color: #333; text-align: left; margin-left: 10px; }
+
+        ul { list-style-type: none; padding: 0; }
+        li { margin-bottom: 10px; list-style: none; }
+
+        .welcome-message {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #4caf50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 18px;
+        }
+
+        #doneMessage {
+            text-align: center;
+            color: green;
+            font-weight: bold;
+            display: none;
+            font-size: 24px;
+        }
+
+        .button-transfer {
+            background-color: #2196F3;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            width: 90px;
+            position: fixed;
+            top: 12px;
+            right: 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-message" id="welcomeMessage">Welcome!</div>
+    <h1>Tasks for the day</h1>
+    <br>
+    <h2>Your Patients:</h2>
+    <button class="button-transfer" onclick="window.location.href='transfer.html'">Transfer</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBwj-XFHbxIkfYyVJaXCSqf118A_LYVg8",
+            authDomain: "doctorreg-2fc4a.firebaseapp.com",
+            databaseURL: "https://doctorreg-2fc4a-default-rtdb.firebaseio.com",
+            projectId: "doctorreg-2fc4a",
+            storageBucket: "doctorreg-2fc4a.appspot.com",
+            messagingSenderId: "686704002624",
+            appId: "1:686704002624:web:53dd70a58e0159c4ea41a5"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const userEmail = localStorage.getItem('userEmail');
+        let tasksCount = 0;
+        let doneTasksCount = 0;
+
+        setTimeout(() => {
+            document.getElementById('welcomeMessage').style.display = 'none';
+        }, 1000);
+
+        if (userEmail) {
+            const patientsQuery = query(collection(db, 'PatientSet'), where('doctorEmail', '==', userEmail));
+
+            getDocs(patientsQuery).then(querySnapshot => {
+                tasksCount = querySnapshot.size;
+
+                if (tasksCount === 0) {
+                    const msg = document.createElement('p');
+                    msg.innerText = 'No Patients for today.';
+                    msg.style.cssText = 'text-align:center;font-size:24px;color:#333;margin-top:20px;';
+                    document.body.appendChild(msg);
+                } else {
+                    const sorted = [];
+                    querySnapshot.forEach(d => sorted.push({ id: d.id, data: d.data() }));
+                    sorted.sort((a, b) => a.data.time.localeCompare(b.data.time));
+
+                    sorted.forEach(patient => {
+                        const container = document.createElement('div');
+                        container.className = 'task-container';
+
+                        container.innerHTML = `
+                            <p>Patient ID: ${patient.data.patientId}</p>
+                            <p>Name: ${patient.data.name}</p>
+                            <p>Time: ${patient.data.time}</p>
+                        `;
+
+                        const btns = document.createElement('div');
+                        btns.className = 'buttons-container';
+
+                        const doneBtn = document.createElement('button');
+                        doneBtn.className = 'button button-done';
+                        doneBtn.innerText = 'Done';
+                        doneBtn.addEventListener('click', () => {
+                            deleteDoc(doc(db, 'PatientSet', patient.id));
+                            container.style.display = 'none';
+                            doneTasksCount++;
+                            if (doneTasksCount === tasksCount) {
+                                document.getElementById('doneMessage').style.display = 'block';
+                            }
+                        });
+
+                        btns.appendChild(doneBtn);
+                        container.appendChild(btns);
+                        document.body.appendChild(container);
+                    });
+                }
+            });
+        }
+    </script>
+
+    <div id="doneMessage">You are done for the day!</div>
+</body>
+</html>

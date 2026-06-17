@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Doctors List</title>
+    <style>
+        body { font-family: Roboto, sans-serif; }
+
+        h1 {
+            background-color: #252525;
+            padding: 10px;
+            margin: 0;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .container img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+
+        .container-text { flex-grow: 1; }
+        .container-text p:first-child { font-weight: bold; }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; align-items: center; text-align: center; }
+            .container img { margin-bottom: 10px; margin-right: 0; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Doctors Available</h1>
+
+    <div class="container" onclick="openDetails('doctor1')">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Dr. Akash Roy">
+        <div class="container-text">
+            <p>Dr. Akash Roy</p>
+            <p>Cardiologist</p>
+            <p>MD in Cardiology, ABC Medical School</p>
+            <p>10+ years of experience</p>
+        </div>
+    </div>
+
+    <div class="container" onclick="openDetails('doctor2')">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Dr. Jane Barnes">
+        <div class="container-text">
+            <p>Dr. Jane Barnes</p>
+            <p>Pediatrician</p>
+            <p>MD in Pediatrics, XYZ Medical College</p>
+            <p>8+ years of experience</p>
+        </div>
+    </div>
+
+    <div class="container" onclick="openDetails('doctor3')">
+        <img src="https://randomuser.me/api/portraits/men/56.jpg" alt="Dr. Michael Scott">
+        <div class="container-text">
+            <p>Dr. Michael Scott</p>
+            <p>Orthopedic Surgeon</p>
+            <p>MS in Orthopedics, DEF University</p>
+            <p>12+ years of experience</p>
+        </div>
+    </div>
+
+    <div class="container" onclick="openDetails('doctor4')">
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Dr. Shruti Sharma">
+        <div class="container-text">
+            <p>Dr. Shruti Sharma</p>
+            <p>OB-GYN</p>
+            <p>MD in Obstetrics and Gynecology, GHI Medical Institute</p>
+            <p>9+ years of experience</p>
+        </div>
+    </div>
+
+    <div class="container" onclick="openDetails('doctor5')">
+        <img src="https://randomuser.me/api/portraits/men/78.jpg" alt="Dr. Robert Green">
+        <div class="container-text">
+            <p>Dr. Robert Green</p>
+            <p>Neurologist</p>
+            <p>PhD in Neurology, JKL University</p>
+            <p>15+ years of experience</p>
+        </div>
+    </div>
+
+    <script>
+        function openDetails(doctorId) {
+            window.location.href = `details.html?doctor=${doctorId}`;
+        }
+    </script>
+</body>
+</html>
