@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spice Garden Restaurant</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Segoe UI', sans-serif; background: #0d0d0d; color: #f0ece2; }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 60px;
+      background: rgba(0,0,0,0.9);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid #c8952a44;
+    }
+
+    .logo { font-size: 1.5rem; font-weight: 700; color: #c8952a; letter-spacing: 1px; }
+
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav ul a { color: #f0ece2; text-decoration: none; font-size: 0.95rem; transition: color 0.2s; }
+    nav ul a:hover { color: #c8952a; }
+
+    /* HERO */
+    .hero {
+      min-height: 90vh;
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+                  url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1400') center/cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .hero h1 { font-size: 3.5rem; color: #c8952a; margin-bottom: 16px; }
+    .hero p  { font-size: 1.2rem; color: #ddd; max-width: 560px; margin-bottom: 32px; }
+
+    .btn {
+      padding: 14px 36px;
+      background: #c8952a;
+      color: #0d0d0d;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: #e6aa30; }
+
+    /* SECTION COMMONS */
+    section { padding: 80px 60px; }
+    .section-title {
+      text-align: center;
+      font-size: 2rem;
+      color: #c8952a;
+      margin-bottom: 8px;
+    }
+    .section-sub {
+      text-align: center;
+      color: #aaa;
+      margin-bottom: 48px;
+      font-size: 0.95rem;
+    }
+
+    /* MENU */
+    #menu { background: #111; }
+
+    .menu-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 9px 24px;
+      border: 2px solid #c8952a;
+      background: transparent;
+      color: #c8952a;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .tab-btn.active, .tab-btn:hover { background: #c8952a; color: #0d0d0d; }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .menu-card {
+      background: #1a1a1a;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .menu-card:hover { transform: translateY(-4px); }
+
+    .menu-card img { width: 100%; height: 180px; object-fit: cover; }
+
+    .menu-card-body { padding: 16px; }
+    .menu-card-body h4 { font-size: 1.05rem; margin-bottom: 6px; }
+    .menu-card-body p  { font-size: 0.85rem; color: #999; margin-bottom: 12px; }
+
+    .menu-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .price { color: #c8952a; font-weight: 700; font-size: 1.1rem; }
+
+    .add-btn {
+      padding: 7px 18px;
+      background: #c8952a;
+      border: none;
+      border-radius: 6px;
+      color: #0d0d0d;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .add-btn:hover { background: #e6aa30; }
+
+    /* CART TOAST */
+    #cart-toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #c8952a;
+      color: #0d0d0d;
+      padding: 14px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s;
+      z-index: 999;
+    }
+    #cart-toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ABOUT */
+    #about {
+      background: #0d0d0d;
+      display: flex;
+      gap: 60px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .about-img {
+      flex: 1;
+      min-width: 260px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .about-img img { width: 100%; height: 340px; object-fit: cover; border-radius: 12px; }
+
+    .about-text { flex: 1; min-width: 260px; }
+    .about-text h2 { font-size: 2rem; color: #c8952a; margin-bottom: 16px; }
+    .about-text p  { color: #aaa; line-height: 1.8; margin-bottom: 16px; }
+
+    .stats { display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap; }
+    .stat h3 { font-size: 2rem; color: #c8952a; }
+    .stat p   { color: #888; font-size: 0.85rem; }
+
+    /* CONTACT */
+    #contact { background: #111; }
+
+    .contact-form {
+      max-width: 560px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .contact-form input,
+    .contact-form textarea,
+    .contact-form select {
+      padding: 13px 16px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #f0ece2;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .contact-form textarea { resize: vertical; min-height: 120px; }
+    .contact-form input:focus,
+    .contact-form textarea:focus,
+    .contact-form select:focus { border-color: #c8952a; }
+
+    .contact-form button {
+      padding: 14px;
+      background: #c8952a;
+      border: none;
+      border-radius: 8px;
+      color: #0d0d0d;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .contact-form button:hover { background: #e6aa30; }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 24px;
+      background: #000;
+      color: #555;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      nav ul { gap: 16px; }
+      .hero h1 { font-size: 2.2rem; }
+      section { padding: 60px 20px; }
+      #about { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">🍛 Spice Garden</div>
+    <ul>
+      <li><a href="#home">Home</a></li>
+      <li><a href="#menu">Menu</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Reserve</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <h1>Spice Garden</h1>
+    <p>Authentic flavors crafted with passion. Experience the finest Indian cuisine in the heart of Bengaluru.</p>
+    <a href="#menu" class="btn">Explore Menu</a>
+  </section>
+
+  <!-- MENU -->
+  <section id="menu">
+    <h2 class="section-title">Our Menu</h2>
+    <p class="section-sub">Fresh ingredients, bold flavors, unforgettable taste</p>
+
+    <div class="menu-tabs">
+      <button class="tab-btn active" onclick="filterMenu('all', this)">All</button>
+      <button class="tab-btn" onclick="filterMenu('starters', this)">Starters</button>
+      <button class="tab-btn" onclick="filterMenu('mains', this)">Main Course</button>
+      <button class="tab-btn" onclick="filterMenu('drinks', this)">Drinks</button>
+    </div>
+
+    <div class="menu-grid" id="menu-grid"></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="about-img">
+      <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600" alt="Restaurant interior">
+    </div>
+    <div class="about-text">
+      <h2>Our Story</h2>
+      <p>Founded in 2018, Spice Garden has been serving authentic Indian cuisine with a modern twist. Every dish is crafted using traditional recipes passed down through generations, combined with the finest locally sourced ingredients.</p>
+      <p>Our chefs bring 20+ years of culinary experience to your plate — from rich Mughlai curries to crispy South Indian delicacies.</p>
+      <div class="stats">
+        <div class="stat"><h3>5K+</h3><p>Happy Customers</p></div>
+        <div class="stat"><h3>80+</h3><p>Menu Items</p></div>
+        <div class="stat"><h3>6</h3><p>Years of Excellence</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT / RESERVE -->
+  <section id="contact">
+    <h2 class="section-title">Reserve a Table</h2>
+    <p class="section-sub">Book your table in advance and enjoy a seamless dining experience</p>
+    <form class="contact-form" onsubmit="handleReservation(event)">
+      <input type="text" placeholder="Your Name" required>
+      <input type="tel" placeholder="Phone Number" required>
+      <input type="date" required>
+      <select required>
+        <option value="" disabled selected>Select Time</option>
+        <option>12:00 PM</option>
+        <option>1:00 PM</option>
+        <option>7:00 PM</option>
+        <option>8:00 PM</option>
+        <option>9:00 PM</option>
+      </select>
+      <select required>
+        <option value="" disabled selected>Number of Guests</option>
+        <option>1</option><option>2</option><option>3</option>
+        <option>4</option><option>5</option><option>6+</option>
+      </select>
+      <textarea placeholder="Special requests (optional)"></textarea>
+      <button type="submit">Confirm Reservation</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2024 Spice Garden. Bengaluru, India &nbsp;|&nbsp; +91 98765 43210 &nbsp;|&nbsp; hello@spicegarden.in</p>
+  </footer>
+
+  <div id="cart-toast"></div>
+
+  <script>
+    const menuItems = [
+      { name: "Paneer Tikka", category: "starters", price: 249, desc: "Marinated cottage cheese grilled to perfection", img: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=400" },
+      { name: "Veg Spring Rolls", category: "starters", price: 179, desc: "Crispy rolls stuffed with fresh vegetables", img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=400" },
+      { name: "Chicken 65", category: "starters", price: 299, desc: "Spicy deep-fried chicken with curry leaves", img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=400" },
+      { name: "Butter Chicken", category: "mains", price: 349, desc: "Tender chicken in rich tomato-butter gravy", img: "https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400" },
+      { name: "Paneer Butter Masala", category: "mains", price: 299, desc: "Creamy cottage cheese in aromatic masala", img: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400" },
+      { name: "Biryani", category: "mains", price: 399, desc: "Fragrant basmati rice with spiced meat & saffron", img: "https://images.unsplash.com/photo-1589302168068-964664d93dc0?w=400" },
+      { name: "Dal Tadka", category: "mains", price: 229, desc: "Yellow lentils tempered with ghee and spices", img: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400" },
+      { name: "Mango Lassi", category: "drinks", price: 129, desc: "Chilled yogurt blended with Alphonso mango", img: "https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=400" },
+      { name: "Masala Chai", category: "drinks", price: 79, desc: "Traditional spiced tea with milk", img: "https://images.unsplash.com/photo-1571934811356-5cc061b6821f?w=400" },
+    ];
+
+    function renderMenu(filter) {
+      const grid = document.getElementById('menu-grid');
+      const items = filter === 'all' ? menuItems : menuItems.filter(i => i.category === filter);
+      grid.innerHTML = items.map(item => `
+        <div class="menu-card">
+          <img src="${item.img}" alt="${item.name}" loading="lazy">
+          <div class="menu-card-body">
+            <h4>${item.name}</h4>
+            <p>${item.desc}</p>
+            <div class="menu-card-footer">
+              <span class="price">₹${item.price}</span>
+              <button class="add-btn" onclick="addToCart('${item.name}')">Add +</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterMenu(cat, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMenu(cat);
+    }
+
+    function addToCart(name) {
+      const toast = document.getElementById('cart-toast');
+      toast.textContent = `"${name}" added to order!`;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    function handleReservation(e) {
+      e.preventDefault();
+      alert('Table reserved successfully! We look forward to seeing you.');
+      e.target.reset();
+    }
+
+    renderMenu('all');
+  </script>
+</body>
+</html>

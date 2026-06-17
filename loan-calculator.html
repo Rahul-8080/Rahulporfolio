@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoanCalc – EMI & Loan Calculator</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface2: #f0f4ff;
+      --border: #e2e8f0;
+      --text: #1a202c;
+      --text2: #64748b;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #1a2744;
+      --border: #334155;
+      --text: #f1f5f9;
+      --text2: #94a3b8;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* NAV */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-tabs { display: flex; gap: 4px; }
+
+    .nav-tab {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover { background: var(--surface2); color: var(--primary); }
+    .nav-tab.active { background: var(--primary); color: white; }
+
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      transition: all 0.2s;
+    }
+
+    /* PAGES */
+    .page { display: none; padding: 32px 40px; max-width: 1100px; margin: 0 auto; }
+    .page.active { display: block; }
+
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 800; }
+    .page-header p  { color: var(--text2); margin-top: 6px; }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    /* GRID */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+    /* FORM */
+    .form-group { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--bg);
+      transition: border-color 0.2s;
+    }
+
+    .input-wrap:focus-within { border-color: var(--primary); }
+
+    .input-prefix, .input-suffix {
+      padding: 0 12px;
+      color: var(--text2);
+      font-size: 0.9rem;
+      background: var(--surface2);
+      height: 44px;
+      display: flex;
+      align-items: center;
+      font-weight: 600;
+      border-right: 1px solid var(--border);
+    }
+
+    .input-suffix { border-right: none; border-left: 1px solid var(--border); }
+
+    input[type="number"], select {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      width: 100%;
+    }
+
+    select { appearance: none; cursor: pointer; }
+
+    /* SLIDER */
+    .slider-row { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
+
+    input[type="range"] {
+      width: 100%;
+      margin-top: 10px;
+      height: 6px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* BUTTON */
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-primary:hover { background: var(--primary-dark); }
+
+    /* SUMMARY CARDS */
+    .summary-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .summary-card .label { font-size: 0.8rem; color: var(--text2); margin-bottom: 8px; }
+    .summary-card .value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+    .summary-card .sub   { font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
+
+    /* PIE CHART */
+    .chart-wrap {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    canvas#pieChart { flex-shrink: 0; }
+
+    .chart-legend { flex: 1; min-width: 160px; }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+
+    /* TABLE */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+    thead th {
+      background: var(--primary);
+      color: white;
+      padding: 12px 16px;
+      text-align: right;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    thead th:first-child { text-align: center; }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:hover { background: var(--surface2); }
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody td {
+      padding: 10px 16px;
+      text-align: right;
+      color: var(--text);
+    }
+
+    tbody td:first-child { text-align: center; font-weight: 600; color: var(--primary); }
+
+    .interest-cell { color: var(--warning); font-weight: 600; }
+    .principal-cell { color: var(--success); font-weight: 600; }
+
+    .table-pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      font-size: 0.85rem;
+      color: var(--text2);
+    }
+
+    .page-btns { display: flex; gap: 8px; }
+
+    .page-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 6px;
+      color: var(--text);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover:not(:disabled) { background: var(--primary); color: white; border-color: var(--primary); }
+    .page-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* CURRENCY PAGE */
+    .currency-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .currency-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .currency-card .cc { font-size: 0.8rem; color: var(--text2); }
+    .currency-card .cv { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+
+    /* ABOUT */
+    .feature-list { list-style: none; margin-top: 16px; }
+    .feature-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+
+    .feature-list li:last-child { border: none; }
+    .feature-list .fi { font-size: 1.3rem; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 16px; }
+      .page { padding: 20px 16px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .nav-logo span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">🏦 <span>LoanCalc</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('home', this)">Calculator</button>
+      <button class="nav-tab" onclick="showPage('amortization', this)">Amortization</button>
+      <button class="nav-tab" onclick="showPage('currency', this)">Currency</button>
+      <button class="nav-tab" onclick="showPage('about', this)">About</button>
+    </div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+  </nav>
+
+  <!-- HOME PAGE -->
+  <div class="page active" id="page-home">
+    <div class="page-header">
+      <h1>Loan EMI Calculator</h1>
+      <p>Calculate your monthly EMI, total interest, and full repayment schedule instantly.</p>
+    </div>
+
+    <div class="grid-2" style="align-items:start;">
+
+      <!-- LEFT: INPUTS -->
+      <div class="card">
+        <div class="form-group">
+          <label>Loan Amount</label>
+          <div class="input-wrap">
+            <div class="input-prefix" id="currencyPrefix">₹</div>
+            <input type="number" id="principal" value="500000" min="0" max="100000000" oninput="onInputChange()">
+          </div>
+          <input type="range" id="principalSlider" min="10000" max="10000000" step="10000" value="500000" oninput="syncSlider('principal','principalSlider'); calculate()">
+          <div class="slider-row"><span>₹10,000</span><span>₹1,00,00,000</span></div>
+        </div>
+
+        <div class="form-group">
+          <label>Annual Interest Rate</label>
+          <div class="input-wrap">
+            <input type="number" id="interest" value="10" min="0.1" max="50" step="0.1" oninput="onInputChange()">
+            <div class="input-suffix">%</div>
+          </div>
+          <input type="range" id="interestSlider" min="0.1" max="30" step="0.1" value="10" oninput="syncSlider('interest','interestSlider'); calculate()">
+          <div class="slider-row"><span>0.1%</span><span>30%</span></div>
+        </div>
+
+        <div class="form-group">
+          <label>Loan Term (months)</label>
+          <div class="input-wrap">
+            <input type="number" id="term" value="60" min="1" max="360" oninput="onInputChange()">
+          </div>
+          <input type="range" id="termSlider" min="1" max="360" step="1" value="60" oninput="syncSlider('term','termSlider'); calculate()">
+          <div class="slider-row"><span>1 month</span><span>360 months (30 yrs)</span></div>
+        </div>
+
+        <div class="form-group">
+          <label>Currency</label>
+          <div class="input-wrap">
+            <select id="currencySelect" onchange="onCurrencyChange()">
+              <option value="INR">🇮🇳 INR – Indian Rupee</option>
+              <option value="USD">🇺🇸 USD – US Dollar</option>
+              <option value="EUR">🇪🇺 EUR – Euro</option>
+              <option value="GBP">🇬🇧 GBP – British Pound</option>
+              <option value="JPY">🇯🇵 JPY – Japanese Yen</option>
+              <option value="AUD">🇦🇺 AUD – Australian Dollar</option>
+              <option value="CAD">🇨🇦 CAD – Canadian Dollar</option>
+              <option value="SGD">🇸🇬 SGD – Singapore Dollar</option>
+              <option value="AED">🇦🇪 AED – UAE Dirham</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="calculate()">Calculate EMI</button>
+      </div>
+
+      <!-- RIGHT: RESULTS -->
+      <div>
+        <div class="grid-3" style="margin-bottom:20px;">
+          <div class="summary-card">
+            <div class="label">Monthly EMI</div>
+            <div class="value" id="emiVal">₹0</div>
+            <div class="sub">per month</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Total Interest</div>
+            <div class="value" id="interestVal" style="color:var(--warning)">₹0</div>
+            <div class="sub">total cost</div>
+          </div>
+          <div class="summary-card">
+            <div class="label">Total Payment</div>
+            <div class="value" id="totalVal" style="color:var(--success)">₹0</div>
+            <div class="sub">principal + interest</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:1rem;margin-bottom:4px;">Breakdown</h3>
+          <div class="chart-wrap">
+            <canvas id="pieChart" width="160" height="160"></canvas>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#3b82f6;"></div>
+                <div>
+                  <div style="font-weight:600;">Principal Amount</div>
+                  <div id="legendPrincipal" style="color:var(--text2);font-size:0.8rem;">₹0</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:#f59e0b;"></div>
+                <div>
+                  <div style="font-weight:600;">Total Interest</div>
+                  <div id="legendInterest" style="color:var(--text2);font-size:0.8rem;">₹0</div>
+                </div>
+              </div>
+              <div class="legend-item" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);">
+                <div class="legend-dot" style="background:var(--success);"></div>
+                <div>
+                  <div style="font-weight:600;">Total Payable</div>
+                  <div id="legendTotal" style="color:var(--text2);font-size:0.8rem;">₹0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AMORTIZATION PAGE -->
+  <div class="page" id="page-amortization">
+    <div class="page-header">
+      <h1>Amortization Schedule</h1>
+      <p>Month-by-month breakdown of principal, interest, and remaining balance.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="grid-3">
+        <div><span style="color:var(--text2);font-size:0.8rem;">Loan Amount</span><br><strong id="amoLoan">—</strong></div>
+        <div><span style="color:var(--text2);font-size:0.8rem;">Interest Rate</span><br><strong id="amoRate">—</strong></div>
+        <div><span style="color:var(--text2);font-size:0.8rem;">Monthly EMI</span><br><strong id="amoEmi" style="color:var(--primary)">—</strong></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>EMI</th>
+              <th>Principal</th>
+              <th>Interest</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="amoBody"></tbody>
+        </table>
+      </div>
+      <div class="table-pagination">
+        <span id="pageInfo">Showing 1-12 of 60</span>
+        <div class="page-btns">
+          <button class="page-btn" id="prevBtn" onclick="changePage(-1)" disabled>← Prev</button>
+          <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURRENCY PAGE -->
+  <div class="page" id="page-currency">
+    <div class="page-header">
+      <h1>Currency Exchange</h1>
+      <p>See your loan amount and EMI converted across major world currencies.</p>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="grid-2" style="align-items:end;gap:16px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Base Amount</label>
+          <div class="input-wrap">
+            <input type="number" id="convertAmt" value="500000" oninput="updateCurrencyTable()">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Base Currency</label>
+          <div class="input-wrap">
+            <select id="convertFrom" onchange="updateCurrencyTable()">
+              <option value="INR">INR</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="currency-grid" id="currencyGrid"></div>
+  </div>
+
+  <!-- ABOUT PAGE -->
+  <div class="page" id="page-about">
+    <div class="page-header">
+      <h1>About LoanCalc</h1>
+      <p>A full-featured loan EMI calculator built with React, TypeScript, and Material UI.</p>
+    </div>
+
+    <div class="grid-2" style="align-items:start;">
+      <div class="card">
+        <h3 style="margin-bottom:16px;">Features</h3>
+        <ul class="feature-list">
+          <li><span class="fi">📊</span> EMI Calculator with real-time sliders</li>
+          <li><span class="fi">📅</span> Month-by-month amortization schedule</li>
+          <li><span class="fi">💱</span> Multi-currency support & conversion</li>
+          <li><span class="fi">🥧</span> Interactive pie chart breakdown</li>
+          <li><span class="fi">🌙</span> Dark / Light theme toggle</li>
+          <li><span class="fi">📱</span> Fully responsive design</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:16px;">Tech Stack</h3>
+        <ul class="feature-list">
+          <li><span class="fi">⚛️</span> React.js + TypeScript</li>
+          <li><span class="fi">⚡</span> Vite (build tool)</li>
+          <li><span class="fi">🎨</span> Material UI + Tailwind CSS</li>
+          <li><span class="fi">📐</span> Custom EMI formula hook</li>
+          <li><span class="fi">🔄</span> React Context (Currency & Theme)</li>
+          <li><span class="fi">📋</span> Amortization schedule generator</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <h3 style="margin-bottom:12px;">EMI Formula</h3>
+      <div style="background:var(--surface2);border-radius:10px;padding:16px;font-family:monospace;font-size:1rem;text-align:center;color:var(--primary);border:1px solid var(--border);">
+        EMI = [ P × R × (1 + R)<sup>N</sup> ] / [ (1 + R)<sup>N</sup> − 1 ]
+      </div>
+      <div style="margin-top:14px;font-size:0.9rem;color:var(--text2);display:flex;gap:24px;flex-wrap:wrap;">
+        <span><strong>P</strong> = Principal Loan Amount</span>
+        <span><strong>R</strong> = Monthly Interest Rate (Annual % ÷ 12 ÷ 100)</span>
+        <span><strong>N</strong> = Loan Term in Months</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ── EXCHANGE RATES (base: INR) ─────────────────────────────────────────────
+    const RATES = {
+      INR: 1,
+      USD: 0.012,
+      EUR: 0.011,
+      GBP: 0.0094,
+      JPY: 1.82,
+      AUD: 0.018,
+      CAD: 0.016,
+      SGD: 0.016,
+      AED: 0.044,
+      CNY: 0.086,
+      CHF: 0.011,
+      KRW: 16.1,
+    };
+
+    const SYMBOLS = {
+      INR:'₹', USD:'$', EUR:'€', GBP:'£', JPY:'¥',
+      AUD:'A$', CAD:'C$', SGD:'S$', AED:'د.إ', CNY:'¥', CHF:'Fr', KRW:'₩'
+    };
+
+    // ── STATE ──────────────────────────────────────────────────────────────────
+    let schedule = [];
+    let currentPage = 0;
+    const PAGE_SIZE = 12;
+    let selectedCurrency = 'INR';
+
+    // ── THEME ──────────────────────────────────────────────────────────────────
+    function toggleTheme() {
+      const isDark = document.documentElement.dataset.theme === 'dark';
+      document.documentElement.dataset.theme = isDark ? 'light' : 'dark';
+      document.getElementById('themeBtn').textContent = isDark ? '🌙' : '☀️';
+      drawPie();
+    }
+
+    // ── PAGE NAV ───────────────────────────────────────────────────────────────
+    function showPage(id, btn) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-' + id).classList.add('active');
+      btn.classList.add('active');
+      if (id === 'amortization') renderTable();
+      if (id === 'currency') updateCurrencyTable();
+    }
+
+    // ── CURRENCY ───────────────────────────────────────────────────────────────
+    function getCurrencySymbol(c) { return SYMBOLS[c] || c; }
+
+    function fmt(amount, currency) {
+      const sym = getCurrencySymbol(currency);
+      return sym + Number(amount).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+    }
+
+    function toINR(amount, currency) {
+      return amount / RATES[currency];
+    }
+
+    function fromINR(inr, currency) {
+      return inr * RATES[currency];
+    }
+
+    function onCurrencyChange() {
+      selectedCurrency = document.getElementById('currencySelect').value;
+      document.getElementById('currencyPrefix').textContent = getCurrencySymbol(selectedCurrency);
+      calculate();
+    }
+
+    // ── SLIDER SYNC ────────────────────────────────────────────────────────────
+    function syncSlider(inputId, sliderId) {
+      document.getElementById(inputId).value = document.getElementById(sliderId).value;
+    }
+
+    function onInputChange() {
+      document.getElementById('principalSlider').value = document.getElementById('principal').value;
+      document.getElementById('interestSlider').value  = document.getElementById('interest').value;
+      document.getElementById('termSlider').value      = document.getElementById('term').value;
+      calculate();
+    }
+
+    // ── CALCULATE ─────────────────────────────────────────────────────────────
+    function calculate() {
+      const principalInCurrency = parseFloat(document.getElementById('principal').value) || 0;
+      const rate    = parseFloat(document.getElementById('interest').value) || 0;
+      const term    = parseInt(document.getElementById('term').value) || 0;
+
+      // Convert to INR for internal calc
+      const P = toINR(principalInCurrency, selectedCurrency);
+      const R = rate / 12 / 100;
+      const N = term;
+
+      if (P <= 0 || R <= 0 || N <= 0) {
+        ['emiVal','interestVal','totalVal','legendPrincipal','legendInterest','legendTotal']
+          .forEach(id => document.getElementById(id).textContent = fmt(0, selectedCurrency));
+        schedule = [];
+        drawPie(0, 0);
+        return;
+      }
+
+      const pow = Math.pow(1 + R, N);
+      const emiINR = (P * R * pow) / (pow - 1);
+      const totalINR = emiINR * N;
+      const intINR  = totalINR - P;
+
+      // Convert back to selected currency
+      const emi   = fromINR(emiINR,   selectedCurrency);
+      const total = fromINR(totalINR, selectedCurrency);
+      const intr  = fromINR(intINR,   selectedCurrency);
+
+      document.getElementById('emiVal').textContent      = fmt(emi,   selectedCurrency);
+      document.getElementById('interestVal').textContent = fmt(intr,  selectedCurrency);
+      document.getElementById('totalVal').textContent    = fmt(total, selectedCurrency);
+      document.getElementById('legendPrincipal').textContent = fmt(principalInCurrency, selectedCurrency);
+      document.getElementById('legendInterest').textContent  = fmt(intr, selectedCurrency);
+      document.getElementById('legendTotal').textContent     = fmt(total, selectedCurrency);
+
+      // Build amortization schedule in selected currency
+      schedule = [];
+      let balance = P;
+      for (let m = 1; m <= N; m++) {
+        const intPay  = balance * R;
+        const prinPay = emiINR - intPay;
+        balance = Math.max(0, balance - prinPay);
+        schedule.push({
+          month: m,
+          emi:   fromINR(emiINR,  selectedCurrency),
+          prin:  fromINR(prinPay, selectedCurrency),
+          intr:  fromINR(intPay,  selectedCurrency),
+          bal:   fromINR(balance, selectedCurrency),
+        });
+      }
+
+      drawPie(principalInCurrency, intr);
+      updateAmoSummary(principalInCurrency, rate, emi);
+    }
+
+    function updateAmoSummary(loan, rate, emi) {
+      document.getElementById('amoLoan').textContent = fmt(loan, selectedCurrency);
+      document.getElementById('amoRate').textContent = rate + '% p.a.';
+      document.getElementById('amoEmi').textContent  = fmt(emi, selectedCurrency);
+    }
+
+    // ── PIE CHART ─────────────────────────────────────────────────────────────
+    function drawPie(principal, interest) {
+      const canvas = document.getElementById('pieChart');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height;
+      const cx = W / 2, cy = H / 2, r = Math.min(W, H) / 2 - 8;
+
+      ctx.clearRect(0, 0, W, H);
+
+      const total = (principal || 0) + (interest || 0);
+      if (!total) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#e2e8f0';
+        ctx.fill();
+        return;
+      }
+
+      const pAngle = (principal / total) * Math.PI * 2;
+
+      // Principal slice
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + pAngle);
+      ctx.closePath();
+      ctx.fillStyle = '#3b82f6';
+      ctx.fill();
+
+      // Interest slice
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, -Math.PI / 2 + pAngle, -Math.PI / 2 + Math.PI * 2);
+      ctx.closePath();
+      ctx.fillStyle = '#f59e0b';
+      ctx.fill();
+
+      // Centre hole
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() || '#fff';
+      ctx.fill();
+
+      // Centre label
+      const pct = Math.round((principal / total) * 100);
+      ctx.fillStyle = '#3b82f6';
+      ctx.font = 'bold 18px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(pct + '%', cx, cy - 8);
+      ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text2').trim() || '#666';
+      ctx.font = '11px Segoe UI';
+      ctx.fillText('principal', cx, cy + 10);
+    }
+
+    // ── AMORTIZATION TABLE ────────────────────────────────────────────────────
+    function renderTable() {
+      const tbody = document.getElementById('amoBody');
+      const start = currentPage * PAGE_SIZE;
+      const slice = schedule.slice(start, start + PAGE_SIZE);
+
+      if (!slice.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text2);">Calculate a loan first on the Calculator tab.</td></tr>';
+        document.getElementById('pageInfo').textContent = '';
+        return;
+      }
+
+      tbody.innerHTML = slice.map(r => `
+        <tr>
+          <td>${r.month}</td>
+          <td>${fmt(r.emi, selectedCurrency)}</td>
+          <td class="principal-cell">${fmt(r.prin, selectedCurrency)}</td>
+          <td class="interest-cell">${fmt(r.intr, selectedCurrency)}</td>
+          <td>${fmt(r.bal, selectedCurrency)}</td>
+        </tr>
+      `).join('');
+
+      const total = schedule.length;
+      document.getElementById('pageInfo').textContent =
+        `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, total)} of ${total} months`;
+
+      document.getElementById('prevBtn').disabled = currentPage === 0;
+      document.getElementById('nextBtn').disabled = start + PAGE_SIZE >= total;
+    }
+
+    function changePage(dir) {
+      currentPage += dir;
+      renderTable();
+    }
+
+    // ── CURRENCY TABLE ────────────────────────────────────────────────────────
+    function updateCurrencyTable() {
+      const amount   = parseFloat(document.getElementById('convertAmt').value) || 0;
+      const fromCur  = document.getElementById('convertFrom').value;
+      const inINR    = toINR(amount, fromCur);
+
+      const grid = document.getElementById('currencyGrid');
+      grid.innerHTML = Object.entries(RATES).map(([cur, rate]) => {
+        const converted = inINR * rate;
+        return `
+          <div class="currency-card">
+            <div class="cc">${cur} – ${getCurrencyName(cur)}</div>
+            <div class="cv">${getCurrencySymbol(cur)} ${converted.toLocaleString('en-IN', {maximumFractionDigits: 2})}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function getCurrencyName(c) {
+      const names = {
+        INR:'Indian Rupee', USD:'US Dollar', EUR:'Euro', GBP:'British Pound',
+        JPY:'Japanese Yen', AUD:'Australian Dollar', CAD:'Canadian Dollar',
+        SGD:'Singapore Dollar', AED:'UAE Dirham', CNY:'Chinese Yuan',
+        CHF:'Swiss Franc', KRW:'South Korean Won'
+      };
+      return names[c] || c;
+    }
+
+    // ── INIT ──────────────────────────────────────────────────────────────────
+    calculate();
+    updateCurrencyTable();
+  </script>
+
+</body>
+</html>

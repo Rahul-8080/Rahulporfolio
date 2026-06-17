@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PixelMind – AI Image Generation Platform</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0a0a0f;
+      color: #f0f0f0;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 60px;
+      background: rgba(10,10,20,0.95);
+      border-bottom: 1px solid #ffffff15;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+    }
+
+    nav ul { list-style: none; display: flex; gap: 28px; align-items: center; }
+    nav ul a { color: #ccc; text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    nav ul a:hover { color: #a855f7; }
+
+    .nav-btn {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      border: none;
+      border-radius: 20px;
+      color: white;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    /* HERO */
+    .hero {
+      min-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+      background: radial-gradient(ellipse at 50% 0%, #a855f720 0%, transparent 70%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #6366f115, transparent 70%);
+      top: -100px;
+      right: -100px;
+      border-radius: 50%;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      background: #a855f720;
+      border: 1px solid #a855f750;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: #a855f7;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+    }
+
+    .hero h1 {
+      font-size: 3.8rem;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #a855f7, #6366f1, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: #999;
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 36px;
+    }
+
+    .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    .btn-primary {
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover { opacity: 0.85; }
+
+    .btn-outline {
+      padding: 14px 32px;
+      background: transparent;
+      border: 2px solid #ffffff30;
+      border-radius: 8px;
+      color: #ccc;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color 0.2s;
+    }
+
+    .btn-outline:hover { border-color: #a855f7; color: #a855f7; }
+
+    /* DEMO PREVIEW */
+    .demo-section {
+      padding: 60px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      text-align: center;
+      color: #a855f7;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 48px;
+    }
+
+    /* PROMPT BOX */
+    .prompt-box {
+      background: #12121e;
+      border: 1px solid #ffffff15;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 48px;
+    }
+
+    .prompt-label { font-size: 0.85rem; color: #888; margin-bottom: 10px; }
+
+    .prompt-input-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .prompt-input {
+      flex: 1;
+      padding: 14px 18px;
+      background: #0a0a14;
+      border: 1px solid #ffffff20;
+      border-radius: 10px;
+      color: #f0f0f0;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .prompt-input:focus { border-color: #a855f7; }
+
+    .generate-btn {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.2s;
+    }
+
+    .generate-btn:hover { opacity: 0.85; }
+
+    .suggestions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .suggestion-chip {
+      padding: 5px 14px;
+      background: #1e1e2e;
+      border: 1px solid #ffffff15;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      color: #aaa;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .suggestion-chip:hover { border-color: #a855f7; color: #a855f7; }
+
+    /* IMAGE GRID */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .image-card {
+      background: #12121e;
+      border: 1px solid #ffffff10;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .image-card:hover { transform: translateY(-4px); border-color: #a855f740; }
+
+    .image-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .image-card-body { padding: 14px; }
+    .image-card-body p { font-size: 0.82rem; color: #888; line-height: 1.4; }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .avatar-row { display: flex; align-items: center; gap: 8px; }
+    .avatar-row img { width: 24px; height: 24px; border-radius: 50%; }
+    .avatar-row span { font-size: 0.78rem; color: #666; }
+
+    .like-btn {
+      background: none;
+      border: none;
+      color: #666;
+      cursor: pointer;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s;
+    }
+    .like-btn:hover { color: #f43f5e; }
+
+    /* FEATURES */
+    .features-section {
+      padding: 80px 40px;
+      background: #0d0d18;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: #12121e;
+      border: 1px solid #ffffff10;
+      border-radius: 12px;
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .feature-card:hover { border-color: #a855f740; }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .feature-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feature-card p  { font-size: 0.85rem; color: #777; line-height: 1.6; }
+
+    /* TECH STACK */
+    .tech-section {
+      padding: 80px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .tech-badges {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .tech-badge {
+      padding: 10px 22px;
+      background: #12121e;
+      border: 1px solid #ffffff15;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #ccc;
+      font-weight: 600;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 28px;
+      background: #06060c;
+      border-top: 1px solid #ffffff10;
+      color: #444;
+      font-size: 0.85rem;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      display: none;
+      padding: 20px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #12121e;
+      border: 1px solid #ffffff20;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 460px;
+      width: 100%;
+    }
+
+    .modal h3 { font-size: 1.3rem; margin-bottom: 6px; }
+    .modal p  { color: #888; font-size: 0.9rem; margin-bottom: 24px; }
+
+    .modal input {
+      width: 100%;
+      padding: 12px 14px;
+      background: #0a0a14;
+      border: 1px solid #ffffff20;
+      border-radius: 8px;
+      color: #f0f0f0;
+      font-size: 0.95rem;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    .modal input:focus { border-color: #a855f7; }
+
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+
+    .modal-close {
+      padding: 10px 20px;
+      background: transparent;
+      border: 1px solid #ffffff20;
+      border-radius: 8px;
+      color: #aaa;
+      cursor: pointer;
+    }
+
+    .modal-submit {
+      padding: 10px 24px;
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid #ffffff15;
+      border-top-color: #a855f7;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      nav ul { gap: 14px; }
+      .hero h1 { font-size: 2.4rem; }
+      .demo-section, .tech-section { padding: 60px 20px; }
+      .features-section { padding: 60px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">✦ PixelMind</div>
+    <ul>
+      <li><a href="#generate">Generate</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#" class="nav-btn" onclick="openModal()">Sign In</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="badge">✦ Powered by Stable Diffusion AI</div>
+    <h1>Create Stunning Art<br>with <span>AI Magic</span></h1>
+    <p>PixelMind lets you generate, share, and explore AI-generated artwork. Just describe what you imagine — we'll bring it to life.</p>
+    <div class="hero-btns">
+      <a href="#generate" class="btn-primary">Start Generating</a>
+      <a href="#gallery" class="btn-outline">Browse Gallery</a>
+    </div>
+  </section>
+
+  <!-- GENERATE SECTION -->
+  <div class="demo-section" id="generate">
+    <p class="section-label">AI Generator</p>
+    <h2 class="section-title">Describe Your Vision</h2>
+
+    <div class="prompt-box">
+      <p class="prompt-label">Enter a prompt</p>
+      <div class="prompt-input-row">
+        <input class="prompt-input" id="promptInput" type="text" placeholder="A futuristic city at sunset with neon lights...">
+        <button class="generate-btn" onclick="generateImage()">✦ Generate</button>
+      </div>
+      <div class="suggestions">
+        <span class="suggestion-chip" onclick="setPrompt(this)">Cyberpunk cityscape at night</span>
+        <span class="suggestion-chip" onclick="setPrompt(this)">Mystical forest with glowing trees</span>
+        <span class="suggestion-chip" onclick="setPrompt(this)">Astronaut on a colorful alien planet</span>
+        <span class="suggestion-chip" onclick="setPrompt(this)">Abstract watercolor galaxy</span>
+        <span class="suggestion-chip" onclick="setPrompt(this)">Japanese samurai in cherry blossoms</span>
+      </div>
+
+      <!-- RESULT -->
+      <div id="result-area" style="display:none; margin-top:28px;">
+        <div id="loading-state" style="text-align:center; padding:40px 0;">
+          <div class="spinner"></div>
+          <p style="color:#888; margin-top:16px; font-size:0.9rem;">Generating your image, please wait…</p>
+        </div>
+        <div id="image-result" style="display:none;">
+          <img id="generated-img" src="" alt="Generated" style="width:100%; border-radius:12px; display:block; margin-bottom:16px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button onclick="downloadImage()" style="flex:1; padding:11px; background:linear-gradient(135deg,#a855f7,#6366f1); border:none; border-radius:8px; color:white; font-weight:700; cursor:pointer;">⬇ Download</button>
+            <button onclick="addToGallery()" style="flex:1; padding:11px; background:#1e1e2e; border:1px solid #ffffff20; border-radius:8px; color:#ccc; font-weight:700; cursor:pointer;">+ Add to Gallery</button>
+          </div>
+        </div>
+        <div id="error-state" style="display:none; text-align:center; padding:20px; color:#f87171;">
+          <p>⚠ Could not generate image. Please try again.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GALLERY -->
+    <p class="section-label" id="gallery">Community Gallery</p>
+    <h2 class="section-title">Explore Creations</h2>
+
+    <div class="image-grid" id="gallery-grid">
+      <div class="image-card">
+        <img src="https://images.unsplash.com/photo-1636955816868-fcb881e57954?w=400" alt="AI Art">
+        <div class="image-card-body">
+          <p>Cyberpunk cityscape at night with neon reflections</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="">
+              <span>@rahul_dev</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 42</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-card">
+        <img src="https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?w=400" alt="AI Art">
+        <div class="image-card-body">
+          <p>Abstract watercolor galaxy with vibrant colors</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="">
+              <span>@priya_art</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 87</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-card">
+        <img src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?w=400" alt="AI Art">
+        <div class="image-card-body">
+          <p>Mystical forest with glowing bioluminescent trees</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="https://randomuser.me/api/portraits/men/56.jpg" alt="">
+              <span>@arjun_ai</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 63</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-card">
+        <img src="https://images.unsplash.com/photo-1632516643720-e7f5d7d6ecc9?w=400" alt="AI Art">
+        <div class="image-card-body">
+          <p>Astronaut floating in a colorful nebula galaxy</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="">
+              <span>@kavya_cosmos</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 119</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-card">
+        <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?w=400" alt="AI Art">
+        <div class="image-card-body">
+          <p>Impressionist oil painting of a sunflower field at dawn</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="https://randomuser.me/api/portraits/men/78.jpg" alt="">
+              <span>@dev_visuals</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 54</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="image-card">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400" alt="AI Art">
+        <div class="image-card-body">
+          <p>Futuristic robot in a post-apocalyptic wasteland</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="">
+              <span>@tech_artist</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 76</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <p class="section-label" style="text-align:center;">Why PixelMind</p>
+    <h2 class="section-title" style="text-align:center;max-width:500px;margin:0 auto 48px;">Everything You Need to Create</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <span class="feature-icon">🎨</span>
+        <h4>AI Image Generation</h4>
+        <p>Powered by OpenAI DALL·E. Enter any prompt and watch your imagination come to life in seconds.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔐</span>
+        <h4>Secure Authentication</h4>
+        <p>JWT-based auth with encrypted passwords. Your account and creations are always protected.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">☁️</span>
+        <h4>Cloud Storage</h4>
+        <p>All generated images are stored and managed via MongoDB. Access your gallery anywhere, anytime.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">🔍</span>
+        <h4>Search & Browse</h4>
+        <p>Explore the community gallery with search and filters. Get inspired by other creators.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">💫</span>
+        <h4>Share Creations</h4>
+        <p>Publish your AI art to the community gallery and collect likes from other users.</p>
+      </div>
+      <div class="feature-card">
+        <span class="feature-icon">⚡</span>
+        <h4>Fast REST API</h4>
+        <p>Built with Express.js for high-performance image generation and retrieval endpoints.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="tech-section">
+    <p class="section-label">Built With</p>
+    <h2 class="section-title">Tech Stack</h2>
+    <div class="tech-badges">
+      <div class="tech-badge">⚛️ React.js</div>
+      <div class="tech-badge">🟢 Node.js</div>
+      <div class="tech-badge">🚂 Express.js</div>
+      <div class="tech-badge">🍃 MongoDB</div>
+      <div class="tech-badge">🤖 OpenAI API</div>
+      <div class="tech-badge">🔑 JWT Auth</div>
+      <div class="tech-badge">💨 Tailwind CSS</div>
+      <div class="tech-badge">⚡ Vite</div>
+      <div class="tech-badge">🔷 TypeScript</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>PixelMind – AI Image Generation Platform &nbsp;|&nbsp; Built by Rahul Chodagiri</p>
+  </footer>
+
+  <!-- LOGIN MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <h3>Sign In to PixelMind</h3>
+      <p>Create and save your AI-generated artwork</p>
+      <input type="email" placeholder="Email address">
+      <input type="password" placeholder="Password">
+      <div class="modal-footer">
+        <button class="modal-close" onclick="closeModal()">Cancel</button>
+        <button class="modal-submit" onclick="closeModal(); alert('This is a portfolio showcase. The full app requires a running server.')">Sign In</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal() {
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('open');
+    }
+
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    function setPrompt(el) {
+      document.getElementById('promptInput').value = el.textContent;
+    }
+
+    let lastPrompt = '';
+    let lastImgUrl = '';
+
+    async function generateImage() {
+      const prompt = document.getElementById('promptInput').value.trim();
+      if (!prompt) { alert('Please enter a prompt first!'); return; }
+
+      lastPrompt = prompt;
+
+      const resultArea  = document.getElementById('result-area');
+      const loadingEl   = document.getElementById('loading-state');
+      const imageResult = document.getElementById('image-result');
+      const errorEl     = document.getElementById('error-state');
+      const genBtn      = document.querySelector('.generate-btn');
+
+      resultArea.style.display  = 'block';
+      loadingEl.style.display   = 'block';
+      imageResult.style.display = 'none';
+      errorEl.style.display     = 'none';
+      genBtn.disabled = true;
+      genBtn.textContent = '⏳ Generating…';
+
+      resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      const encoded = encodeURIComponent(prompt);
+      const seed    = Math.floor(Math.random() * 999999);
+      const imgUrl  = `https://image.pollinations.ai/prompt/${encoded}?width=768&height=768&seed=${seed}&nologo=true&enhance=true`;
+
+      lastImgUrl = imgUrl;
+
+      const img = new Image();
+      img.onload = function() {
+        document.getElementById('generated-img').src = imgUrl;
+        loadingEl.style.display   = 'none';
+        imageResult.style.display = 'block';
+        genBtn.disabled = false;
+        genBtn.textContent = '✦ Generate';
+      };
+      img.onerror = function() {
+        loadingEl.style.display = 'none';
+        errorEl.style.display   = 'block';
+        genBtn.disabled = false;
+        genBtn.textContent = '✦ Generate';
+      };
+      img.src = imgUrl;
+    }
+
+    function downloadImage() {
+      const a = document.createElement('a');
+      a.href = lastImgUrl;
+      a.download = `pixelmind-${Date.now()}.jpg`;
+      a.target = '_blank';
+      a.click();
+    }
+
+    function addToGallery() {
+      const grid = document.getElementById('gallery-grid');
+      const card = document.createElement('div');
+      card.className = 'image-card';
+      card.innerHTML = `
+        <img src="${lastImgUrl}" alt="Generated" style="width:100%;height:220px;object-fit:cover;">
+        <div class="image-card-body">
+          <p>${lastPrompt}</p>
+          <div class="card-footer">
+            <div class="avatar-row">
+              <img src="assets/images/pf1.jpg" onerror="this.src='https://randomuser.me/api/portraits/men/32.jpg'" alt="" style="width:24px;height:24px;border-radius:50%;">
+              <span>@rahul_dev</span>
+            </div>
+            <button class="like-btn" onclick="toggleLike(this)">♥ 0</button>
+          </div>
+        </div>`;
+      grid.prepend(card);
+      card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function toggleLike(btn) {
+      const count = parseInt(btn.textContent.replace('♥ ', ''));
+      const liked = btn.dataset.liked === 'true';
+      btn.dataset.liked = !liked;
+      btn.textContent = `♥ ${liked ? count - 1 : count + 1}`;
+      btn.style.color = liked ? '#666' : '#f43f5e';
+    }
+
+    document.getElementById('promptInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') generateImage();
+    });
+  </script>
+
+</body>
+</html>
