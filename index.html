@@ -26,6 +26,31 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    /* ── BACK TO TOP BUTTON ─────────────────────────────────────── */
+    #backToTop {
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      width: 44px;
+      height: 44px;
+      background: #ffd700;
+      color: #0d0d0d;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 4px 16px #ffd70055;
+    }
+    #backToTop.show { opacity: 1; transform: translateY(0); }
+    #backToTop:hover { background: #ffb300; transform: translateY(-3px); }
+
     /* ── AVAILABLE FOR WORK BADGE ────────────────────────────────── */
     .available-badge {
       display: inline-flex;
@@ -373,6 +398,9 @@
 </head>
 
 <body>
+
+  <!-- BACK TO TOP -->
+  <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
 
   <!-- WELCOME SCREEN -->
   <div id="welcome-screen">
@@ -1079,6 +1107,13 @@
 
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+  <!-- BACK TO TOP SCRIPT -->
+  <script>
+    window.addEventListener('scroll', () => {
+      document.getElementById('backToTop').classList.toggle('show', window.scrollY > 300);
+    });
+  </script>
 
   <!-- WELCOME SCREEN SCRIPT -->
   <script>
