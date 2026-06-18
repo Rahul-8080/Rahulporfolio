@@ -26,6 +26,36 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <style>
+    /* ── AVAILABLE FOR WORK BADGE ────────────────────────────────── */
+    .available-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 14px;
+      background: #0d2b1a;
+      border: 1px solid #16a34a55;
+      border-radius: 20px;
+      font-family: Poppins, sans-serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: #4ade80;
+      margin-top: 8px;
+      letter-spacing: 0.3px;
+    }
+    .available-dot {
+      width: 8px; height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 0 #22c55e66;
+      animation: pulse-green 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-green {
+      0%   { box-shadow: 0 0 0 0 #22c55e66; }
+      70%  { box-shadow: 0 0 0 7px #22c55e00; }
+      100% { box-shadow: 0 0 0 0 #22c55e00; }
+    }
+
     /* ── LOADING SCREEN ───────────────────────────────────────────── */
     #loader {
       position: fixed; inset: 0;
@@ -385,6 +415,10 @@
         <div class="info-content">
           <h1 class="name" title="RAHUL CHODAGIRI">RAHUL CHODAGIRI</h1>
           <p class="title">Full Stack & AI Developer</p>
+          <div class="available-badge">
+            <span class="available-dot"></span>
+            Available for opportunities
+          </div>
         </div>
 
         <button class="info_more-btn" data-sidebar-btn>
